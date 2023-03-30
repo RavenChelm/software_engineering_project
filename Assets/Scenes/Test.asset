@@ -1,0 +1,98 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80d55d090c78b6240aa6dccd6042a022, type: 3}
+  m_Name: Test
+  m_EditorClassIdentifier: 
+  links:
+  - guid: 7970f981-5443-445a-a687-a6efa89d794c
+    targetGuid: 257c4790-07b2-4954-abc8-31482f658c7a
+    portId: 0
+  - guid: 7970f981-5443-445a-a687-a6efa89d794c
+    targetGuid: 535c93f3-8ba0-4d55-893b-9a85512e1e53
+    portId: 1
+  - guid: f65e6d90-f4cd-42ac-a9a6-e8e9cd4cf392
+    targetGuid: 7970f981-5443-445a-a687-a6efa89d794c
+    portId: 2
+  nodes:
+  - guid: 535c93f3-8ba0-4d55-893b-9a85512e1e53
+    characterSpr: {fileID: 0}
+    characterName: 1111
+    dialogueText: 111
+    backgroundSpr: {fileID: 0}
+    startNode: 0
+    endNode: 1
+    choices: 1
+    choiceOptions:
+    - 
+    nodePosition:
+      serializedVersion: 2
+      x: 1196
+      y: -236
+      width: 499
+      height: 305
+    soundEffect: {fileID: 0}
+    backgroundMusic: {fileID: 0}
+  - guid: 257c4790-07b2-4954-abc8-31482f658c7a
+    characterSpr: {fileID: 0}
+    characterName: sfb
+    dialogueText: sfbsfb
+    backgroundSpr: {fileID: 0}
+    startNode: 0
+    endNode: 1
+    choices: 1
+    choiceOptions:
+    - 
+    nodePosition:
+      serializedVersion: 2
+      x: 1226
+      y: 298
+      width: 499
+      height: 305
+    soundEffect: {fileID: 0}
+    backgroundMusic: {fileID: 0}
+  - guid: f65e6d90-f4cd-42ac-a9a6-e8e9cd4cf392
+    characterSpr: {fileID: 21300000, guid: ddf2e76e8a1f88f46ae1e42277850b48, type: 3}
+    characterName: sd
+    dialogueText: fb
+    backgroundSpr: {fileID: 21300000, guid: f09eae8c0ea04254b90c5386a034a225, type: 3}
+    startNode: 1
+    endNode: 0
+    choices: 1
+    choiceOptions:
+    - 
+    nodePosition:
+      serializedVersion: 2
+      x: 24
+      y: 203
+      width: 499
+      height: 305
+    soundEffect: {fileID: 0}
+    backgroundMusic: {fileID: 0}
+  - guid: 7970f981-5443-445a-a687-a6efa89d794c
+    characterSpr: {fileID: 0}
+    characterName: fb
+    dialogueText: sfb
+    backgroundSpr: {fileID: 0}
+    startNode: 0
+    endNode: 0
+    choices: 2
+    choiceOptions:
+    - sfb
+    - sfb
+    nodePosition:
+      serializedVersion: 2
+      x: 622
+      y: 103
+      width: 499
+      height: 369
+    soundEffect: {fileID: 0}
+    backgroundMusic: {fileID: 0}
