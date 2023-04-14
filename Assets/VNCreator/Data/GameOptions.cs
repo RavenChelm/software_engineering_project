@@ -10,6 +10,10 @@ namespace VNCreator
         public static float sfxVolume = 0.5f;
         public static float readSpeed = 0.5f;
         public static bool isInstantText = false;
+        public static bool isFullScreen = false;
+        public static int Resolution = 0;
+        public static List<string> resolutions = new List<string>();
+        public static Resolution[] rsl = Screen.resolutions;
 
         public static void InitilizeOptions()
         {
@@ -21,6 +25,19 @@ namespace VNCreator
                 readSpeed = PlayerPrefs.GetFloat("ReadSpeed");
             if (PlayerPrefs.HasKey("InstantText"))
                 isInstantText = PlayerPrefs.GetInt("InstantText") == 1 ? true : false;
+            if (PlayerPrefs.HasKey("FullScreen"))
+                isInstantText = PlayerPrefs.GetInt("FullScreen") == 1 ? true : false;
+            if (PlayerPrefs.HasKey("Resolution"))
+                Resolution = PlayerPrefs.GetInt("Resolution");
+
+            resolutions = new List<string>();
+            rsl = Screen.resolutions;
+            foreach (var i in rsl)
+            {
+                resolutions.Add(i.width + "x" + i.height);
+            }
+
+            Resolution = resolutions.Count - 1;
         }
 
         public static void SetMusicVolume(float index)
@@ -45,6 +62,18 @@ namespace VNCreator
         {
             isInstantText = index;
             PlayerPrefs.SetInt("InstantText", index ? 1 : 0);
+        }
+        public static void SetFullScreen(bool index)
+        {
+            isFullScreen = index;
+            Screen.fullScreen = isFullScreen;
+            PlayerPrefs.SetInt("FullScreen", index ? 1 : 0);
+        }
+        public static void SetResolution(int index)
+        {
+            Resolution = index;
+            Screen.SetResolution(rsl[Resolution].width, rsl[Resolution].height, isFullScreen);
+            PlayerPrefs.SetInt("Resolution", index);
         }
     }
 }

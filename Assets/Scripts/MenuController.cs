@@ -4,13 +4,28 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-
+using VNCreator;
+using System.Linq;
+using System;
+using System.IO;
 
 public class MenuController : MonoBehaviour
 {
-    // private List<GameObject> ToggleSave = new List<GameObject>();
-    // private GameObject CurrentSave = null;
-    private bool pause = false;
+    [SerializeField] private string playScene;
+    private bool pause = true;
+    [SerializeField] private GameObject recordField;
+    [SerializeField] private GameObject saveRecordField;
+    [SerializeField] private GameObject textRecordPrefab;
+    [SerializeField] private TMP_Text _profile;
+    [SerializeField] private TMP_Text _progress;
+    [SerializeField] private TMP_Text _timeGame;
+    [SerializeField] private TMP_Text _timeSave;
+    [SerializeField] private TMP_Text _profileSave;
+    [SerializeField] private TMP_Text _progressSave;
+    [SerializeField] private TMP_Text _timeGameSave;
+    [SerializeField] private TMP_Text _timeSaveSave;
+    private List<savedData> saveData;
+    private int _currentSaveIndex = -1;
     //controll app
     public void ExitAplication()
     {
@@ -24,60 +39,153 @@ public class MenuController : MonoBehaviour
     {
         obj.SetActive(false);
     }
-    public void NewGame()
+    public void AddTextLoading()
     {
-        SceneManager.LoadScene("Game", LoadSceneMode.Single);
+        DeleteFieldRecord(recordField);
+
+        saveData = GameSaveManager.Loading();
+        RectTransform rectTransform = recordField.GetComponent<RectTransform>();
+        Vector2 contentSize = Vector2.zero;
+        foreach (savedData data in saveData)
+        {
+            var textOBj = Instantiate(textRecordPrefab, recordField.transform);
+
+            var text = textOBj.GetComponentInChildren<TMP_Text>();
+            text.SetText("Profile: " + data.profile + " , " + "Time Save: " + data.timeSave);
+
+            contentSize.y += textOBj.GetComponent<RectTransform>().sizeDelta.y;
+        }
+        rectTransform.sizeDelta = contentSize;
     }
-    public void ContinueGame()
+    public void AddTextSaving(GameObject field)
     {
-        Debug.Log("Load last saved game");
-        SceneManager.LoadScene("Game", LoadSceneMode.Single);
+        if (field == saveRecordField) DeleteFieldRecord(saveRecordField);
+        else DeleteFieldRecord(recordField);
+
+
+
+        saveData = GameSaveManager.Loading();
+        if (saveData == null) return;
+
+        RectTransform rectTransform = field.GetComponent<RectTransform>();
+        Vector2 contentSize = Vector2.zero;
+        foreach (savedData data in saveData)
+        {
+            var textOBj = Instantiate(textRecordPrefab, field.transform);
+
+            var text = textOBj.GetComponentInChildren<TMP_Text>();
+            text.SetText("Time Save: " + data.timeSave);
+
+            contentSize.y += textOBj.GetComponent<RectTransform>().sizeDelta.y;
+        }
+        rectTransform.sizeDelta = contentSize;
     }
-    public void Save()
+    public void ShowStats(int index)
     {
-        Debug.Log("Save last game");
+        savedData data = saveData[index];
+        _profile.SetText("Profile: " + data.profile);
+        _progress.SetText("Progress: " + data.progress);
+        _timeGame.SetText("Time Game: " + data.timeGame);
+        _timeSave.SetText("Time Save: " + data.timeSave.ToString("MM/dd/yyyy HH:mm:ss"));
+
+        _currentSaveIndex = index;
+    }
+    public void ShowDefaultStats()
+    {
+        _profile.SetText("Profile: ");
+        _progress.SetText("Progress: ");
+        _timeGame.SetText("Time Game: ");
+        _timeSave.SetText("Time Save: ");
+
+    }
+    public void ShowStatsSave(int index)
+    {
+        savedData data = saveData[index];
+        _profileSave.SetText("Profile: " + data.profile);
+        _progressSave.SetText("Progress: " + data.progress);
+        _timeGameSave.SetText("Time Game: " + data.timeGame);
+        _timeSaveSave.SetText("Time Save: " + data.timeSave.ToString("MM/dd/yyyy HH:mm:ss"));
+
+        _currentSaveIndex = index;
+    }
+    public void ShowDefaultStatsSave()
+    {
+        _profileSave.SetText("Profile: ");
+        _progressSave.SetText("Progress: ");
+        _timeGameSave.SetText("Time Game: ");
+        _timeSaveSave.SetText("Time Save: ");
+        _currentSaveIndex = 0;
     }
     public void Load()
     {
-        Debug.Log("Load game");
+        if (_currentSaveIndex != -1)
+        {
+            savedData data = saveData[_currentSaveIndex];
+            var _loadList = data.loadList.Split('_').ToList();
+            GameSaveManager.SetListLoad(_loadList);
+            Debug.Log("Load game");
+
+            if (Time.timeScale == 0) Time.timeScale = 1;
+            GameSaveManager.firstRunTime = DateTime.Now;
+            SceneManager.LoadScene(playScene, LoadSceneMode.Single);
+        }
+        else
+        {
+            Debug.Log("No load file in saveData from MenuController");
+        }
+    }
+    public void LoadLast()
+    {
+        int countFiles = new DirectoryInfo(Application.persistentDataPath).GetFiles().Length;
+        if (countFiles > 0)
+        {
+            saveData = GameSaveManager.Loading();
+            savedData data = saveData[saveData.Count - 1];
+            var _loadList = data.loadList.Split('_').ToList();
+            GameSaveManager.SetListLoad(_loadList);
+            Debug.Log("Load last game");
+        }
+        if (Time.timeScale == 0) Time.timeScale = 1;
+        GameSaveManager.firstRunTime = DateTime.Now;
+        SceneManager.LoadScene(playScene, LoadSceneMode.Single);
+    }
+    public void NewLoad()
+    {
+        if (Time.timeScale == 0) Time.timeScale = 1;
+        GameSaveManager.firstRunBool = true;
+        GameSaveManager.firstRunTime = DateTime.Now;
+        GameSaveManager.SetListLoad(null);
+        SceneManager.LoadScene(playScene, LoadSceneMode.Single);
+    }
+
+    public void Save()
+    {
+        if (_currentSaveIndex == 0)
+        {
+            GameSaveManager.Save(GameSaveManager.listLoad);
+        }
+        else if (_currentSaveIndex > 0)
+        {
+            GameSaveManager.SaveInFile(GameSaveManager.listLoad, _currentSaveIndex);
+        }
+    }
+
+    private void DeleteFieldRecord(GameObject field)
+    {
+        if (field.transform.childCount > 0)
+        {
+            for (int j = field.transform.childCount; j > 0; --j)
+            {
+                DestroyImmediate(field.transform.GetChild(0).gameObject);
+            }
+        }
     }
     public void Pause()
     {
         pause = !pause;
         if (pause) Time.timeScale = 1;
         else Time.timeScale = 0;
+
     }
-
-    // public void SelectToggle(GameObject toggle)
-    // {
-    //     foreach (var tog in ToggleSave)
-    //     {
-    //         if (tog.GetComponent<Toggle>().isOn == true)
-    //         {
-    //             CurrentSave = tog;
-    //         }
-    //         tog.GetComponent<Toggle>().isOn = false;
-    //         tog.transform.GetChild(0).GetComponent<Image>().color = new Vector4(0, 0, 0, 255);
-    //     }
-    //     if (CurrentSave != null)
-    //     {
-    //         CurrentSave.transform.GetChild(0).GetComponent<Image>().color = new Vector4(200, 200, 200, 255);
-    //     }
-    //     else
-    //         Debug.Log("error!");
-    // }
-    // public void Load()
-    // {
-    //     int i = 0;
-
-    //     foreach (var tog in ToggleSave)
-    //     {
-    //         Debug.Log(SaveLoad.savedGames[i].Name);
-    //         if (tog == CurrentSave)
-    //         {
-    //             Game.current = SaveLoad.savedGames[i];
-    //         }
-    //         i++;
-    //     }
-    // }
 }
+
